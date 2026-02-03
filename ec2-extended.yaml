@@ -1,0 +1,108 @@
+Resources:
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AdditionalInfo: String
+      Affinity: String
+      AvailabilityZone: String
+
+      BlockDeviceMappings:
+        - DeviceName: String
+          Ebs:
+            VolumeSize: Integer
+            VolumeType: String
+
+      CpuOptions:
+        CoreCount: Integer
+        ThreadsPerCore: Integer
+
+      CreditSpecification:
+        CPUCredits: String
+
+      DisableApiTermination: Boolean
+      EbsOptimized: Boolean
+
+      ElasticGpuSpecifications:
+        - Type: String
+
+      ElasticInferenceAccelerators:
+        - Type: String
+          Count: Integer
+
+      EnclaveOptions:
+        Enabled: Boolean
+
+      HibernationOptions:
+        Configured: Boolean
+
+      HostId: String
+      HostResourceGroupArn: String
+      IamInstanceProfile: String
+      ImageId: String
+      InstanceInitiatedShutdownBehavior: String
+      InstanceType: String
+      Ipv6AddressCount: Integer
+
+      Ipv6Addresses:
+        - Ipv6Address: String
+
+      KernelId: String
+      KeyName: String
+
+      LaunchTemplate:
+        LaunchTemplateId: String
+        Version: String
+
+      LicenseSpecifications:
+        - LicenseConfigurationArn: String
+
+      MetadataOptions:
+        HttpEndpoint: String
+        HttpTokens: String
+
+      Monitoring: Boolean
+
+      NetworkInterfaces:
+        - DeviceIndex: Integer
+          SubnetId: String
+          GroupSet:
+            - String
+
+      PlacementGroupName: String
+
+      PrivateDnsNameOptions:
+        HostnameType: String
+        EnableResourceNameDnsARecord: Boolean
+        EnableResourceNameDnsAAAARecord: Boolean
+
+      PrivateIpAddress: String
+      PropagateTagsToVolumeOnCreation: Boolean
+      RamdiskId: String
+
+      SecurityGroupIds:
+        - String
+
+      SecurityGroups:
+        - String
+
+      SourceDestCheck: Boolean
+
+      SsmAssociations:
+        - DocumentName: String
+          AssociationParameters:
+            - Key: String
+              Value:
+                - String
+
+      SubnetId: String
+
+      Tags:
+        - Key: String
+          Value: String
+
+      Tenancy: String
+      UserData: String
+
+      Volumes:
+        - Device: String
+          VolumeId: String
