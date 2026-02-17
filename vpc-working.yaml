@@ -1,0 +1,81 @@
+# Description of what this change includes
+# Revision number
+# Date
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Creates a VPC spanning at least 3 Availability Zones in us-west-2.
+  VPC Name tag format: VPC-Crabur5316
+
+Rules:
+  EnforceUsWest2:
+    Assertions:
+      - Assert:
+          Fn::Equals:
+            - Ref: "AWS::Region"
+            - us-west-2
+        AssertDescription: "This template must be deployed in us-west-2."
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: VPC-Crabur5316
+
+  SubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: VPC-Crabur5316-SubnetA
+
+  SubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: VPC-Crabur5316-SubnetB
+
+  SubnetC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [2, !GetAZs ""]
+      CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: VPC-Crabur5316-SubnetC
+
+Outputs:
+  VpcId:
+    Description: The created VPC ID
+    Value: !Ref VPC
+
+  VpcCidr:
+    Description: The VPC CIDR block
+    Value: !GetAtt VPC.CidrBlock
+
+  SubnetAId:
+    Description: Subnet A ID (AZ index 0)
+    Value: !Ref SubnetA
+
+  SubnetBId:
+    Description: Subnet B ID (AZ index 1)
+    Value: !Ref SubnetB
+
+  SubnetCId:
+    Description: Subnet C ID (AZ index 2)
+    Value: !Ref SubnetC
