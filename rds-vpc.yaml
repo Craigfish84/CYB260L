@@ -1,0 +1,135 @@
+# Description of what this change includes
+# Revision number
+# Date
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Creates a VPC spanning at least 3 Availability Zones in us-west-2.
+  VPC Name tag format: VPC-Crabur5316
+
+Rules:
+  EnforceUsWest2:
+    Assertions:
+      - Assert:
+          Fn::Equals:
+            - Ref: AWS::Region
+            - us-west-2
+        AssertDescription: "This template must be deployed in us-west-2."
+
+Parameters:
+  RdsSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Security Group ID to attach to the RDS instance (must allow MySQL if you need access).
+
+  RdsMasterUsername:
+    Type: String
+    Default: Admin
+    Description: Master username for the RDS instance.
+    MinLength: 1
+    MaxLength: 16
+    AllowedPattern: "^[a-zA-Z][a-zA-Z0-9]*$"
+    ConstraintDescription: "Must start with a letter and contain only alphanumeric characters."
+
+  RdsMasterUserPassword:
+    Type: String
+    NoEcho: true
+    Description: Master password for the RDS instance (8-41 chars, include letters/numbers/symbols as needed).
+    MinLength: 8
+    MaxLength: 41
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: VPC-Crabur5316
+
+  SubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: VPC-Crabur5316-SubnetA
+
+  SubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: VPC-Crabur5316-SubnetB
+
+  SubnetC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [2, !GetAZs ""]
+      CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: VPC-Crabur5316-SubnetC
+
+  RdsSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for playground-db
+      SubnetIds:
+        - !Ref SubnetA
+        - !Ref SubnetB
+        - !Ref SubnetC
+      Tags:
+        - Key: Name
+          Value: VPC-Crabur5316-RdsSubnetGroup
+
+  RdsInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: playground-db
+      Engine: mysql
+      DBInstanceClass: db.t3.micro
+      AllocatedStorage: 5
+      MasterUsername: !Ref RdsMasterUsername
+      MasterUserPassword: !Ref RdsMasterUserPassword
+      VPCSecurityGroups:
+        - !Ref RdsSecurityGroupId
+      DBSubnetGroupName: !Ref RdsSubnetGroup
+      PubliclyAccessible: false
+      MultiAZ: false
+      StorageType: gp2
+      BackupRetentionPeriod: 0
+
+Outputs:
+  VpcId:
+    Description: The created VPC ID
+    Value: !Ref VPC
+
+  VpcCidr:
+    Description: The VPC CIDR block
+    Value: !GetAtt VPC.CidrBlock
+
+  SubnetAId:
+    Description: Subnet A ID (AZ index 0)
+    Value: !Ref SubnetA
+
+  SubnetBId:
+    Description: Subnet B ID (AZ index 1)
+    Value: !Ref SubnetB
+
+  SubnetCId:
+    Description: Subnet C ID (AZ index 2)
+    Value: !Ref SubnetC
+
+  RdsEndpointAddress:
+    Description: RDS endpoint address
+    Value: !GetAtt RdsInstance.Endpoint.Address
